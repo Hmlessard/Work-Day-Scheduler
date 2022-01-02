@@ -1,65 +1,50 @@
-$(document).ready(function (){
-    var eventArray = [];
-
-    //fuction to get the data from local storage
-    init()
-
-    //display current date at the top of page
-    $("#currentDay").text(moment().format('MMMM Do, YYYY'));
-
-    //function to color-code data based on past, present or future 
-    $(".row").each(function (){
-        var hour = parseInt($(this).attr("data-hour"));
-        var time = parseInt(moment().format('H'));
-
-        if (hour == time){
-            $(this).find("textarea").addClass("present");
-        } if (hour > time) {
-            $(this).find("textarea").addClass("future");
-        } if (hour < time) {
-            $(this).find("textarea").addClass("past");
-        }
-    })
-})
-
-//Save the user input from textarea into array and assigns it to the time based on data-hour attribute, array is then saved in local storage
-$(".saveBtn").on("click", function(){
-    var text = $(this).parent().find("textarea").val();
-    var hour = $(this).parent().attr("data-hour");
-
-    var calendarEvent = {
-        hour: hour,
-        text: text,
-    };
-
-    eventArray.push(calendarEvent);
-    localStorage.setItem("calendarEvent", JSON.stringify(eventArray));
-})
-
-//Function takes data from local storage and displays it on the page
-function init() {
-    var storedEvents = JSON.parse(localStorage.getItem("calendarEvent"));
-    if (storedEvents !== null){
-        eventArray = storedEvents;
-    }
-
-    for (i=0; i <eventArray.length; i++)
-    $(".row").each(function(){
-        if ($(this).attr("data-hour") == eventArray[i].hour){
-            $(this).find("textarea").val(eventArray[i].text);
-        }
-    })
+// Set current day and date
+function currentDay() {
+    $("#currentDay").text(moment().format("dddd MMMM Do, YYYY"));
 }
 
-//Button to clear data from local storage/array
-$(".btn").on("click", function(){
-    localStorage.clear();
+// Save button to save tasks
+$(".saveBtn").on("click", function() {
+    var textValue = $(this).siblings(".description").val();
+    var hourDiv = $(this).parent().attr("id");
 
-    for (i=0; i < eventArray.length; i++)
-    $(".row").each(function(){
-        if ($(this).attr("data-hour") == eventArray[i].hour) {
-            $(this).find("textarea").val("");
+    localStorage.setItem(hourDiv, textValue);
+});
+
+// Repeats for each hour
+$("#9 .description").val(localStorage.getItem("9"));
+$("#10 .description").val(localStorage.getItem("10"));
+$("#11 .description").val(localStorage.getItem("11"));
+$("#12 .description").val(localStorage.getItem("12"));
+$("#13 .description").val(localStorage.getItem("13"));
+$("#14 .description").val(localStorage.getItem("14"));
+$("#15 .description").val(localStorage.getItem("15"));
+$("#16 .description").val(localStorage.getItem("16"));
+$("#17 .description").val(localStorage.getItem("17"));
+
+// function to assign past/present/future color codes
+function colorCode() {
+    $(".time").each(function() {
+        var divID = parseInt($(this).attr("id")); 
+        var currentTime = moment().hours();
+
+        if (currentTime === divID) {
+            $(this).removeClass("future")
+            $(this).addClass("present")
+        }
+        else if (currentTime > divID) {
+            $(this).removeClass("present")
+            $(this).addClass("past")
+        }
+        else {
+            $(this).addClass("future")
         }
     })
-    eventArray();
-})
+};
+
+currentDay();
+colorCode();
+
+// intervals to update page
+setInterval(colorCode, 60000);
+setInterval(currentDay, 3600000)
